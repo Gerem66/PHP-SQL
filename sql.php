@@ -1,7 +1,5 @@
 <?php
 
-    require('./credentials.php');
-
     class DataBase
     {
         /** @var mysqli $conn */
