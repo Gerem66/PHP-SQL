@@ -5,24 +5,53 @@
         /** @var mysqli $conn */
         private $conn = null;
 
+        /** @var mysqli_stmt|null $error_query */
+        private $error_query = null;
+
         private $db_hostname;
         private $db_database;
         private $db_username;
         private $db_password;
 
-        public function __construct($openConnection = true) {
-            if (!file_exists('settings.json')) {
-                return;
+        /**
+         * DataBase constructor.
+         * @param bool $openConnection If the connection should be opened.
+         * @throws Exception if the settings.json file is not found or failed to read.
+         * @throws Exception if the settings.json file is not valid JSON.
+         * @throws Exception if the parsing of the settings.json file failed.
+         * @throws Exception if the connection failed.
+         */
+        public function __construct($openConnection = true, $settingsPath = __DIR__ . '/settings.json') {
+            if (!file_exists($settingsPath)) {
+                throw(new Exception('settings.json not found'));
             }
 
-            $settings = json_decode(file_get_contents('settings.json'));
+            $settingsContent = file_get_contents($settingsPath);
+            if ($settingsContent === false) {
+                throw(new Exception('Failed to read settings.json'));
+            }
+
+            $settings = json_decode($settingsContent);
+            if ($settings === null) {
+                throw(new Exception('Failed to parse settings.json'));
+            }
+
             $this->db_hostname = $settings->hostname;
             $this->db_database = $settings->database;
             $this->db_username = $settings->username;
             $this->db_password = $settings->password;
 
             if ($openConnection) {
-                $this->OpenConnection();
+                $this->conn = new mysqli(
+                    $this->db_hostname,
+                    $this->db_username,
+                    $this->db_password,
+                    $this->db_database
+                );
+                if ($this->conn->connect_error) {
+                    $error = $this->conn->connect_error;
+                    throw(new Exception('Connection failed: ' . $error));
+                }
             }
         }
 
@@ -34,21 +63,33 @@
         }
 
         /**
-         * Open a connection to the database.
-         * @param bool $exitOnFail If the script should exit if the connection failed.
-         * @return bool If the connection was successful.
-         * @throws Exception if the connection is already open.
+         * Used to get the last error.
+         * @return mysqli_stmt|null The last error or null if there is no error.
          */
-        private function OpenConnection(&$error = null) {
-            $this->conn = new mysqli($this->db_hostname, $this->db_username, $this->db_password, $this->db_database);
-            if ($this->conn->connect_error) {
-                $error = $this->conn->connect_error;
-                return false;
+        public function GetError() {
+            if ($this->conn === null || $this->error_query === null) {
+                return null;
             }
-            return true;
+
+            $error = $this->error_query;
+            $this->error_query = null;
+            return $error;
         }
 
-        function IsSafe($string) {
+        /**
+         * Used to get the last insert ID.
+         * @return int The last insert ID.
+         */
+        public function GetLastInsertID() {
+            return $this->conn->insert_id;
+        }
+
+        /**
+         * Used to check if a string is safe to use in a query.
+         * @param string $string The string to check.
+         * @return bool True if the string is safe, false otherwise.
+         */
+        public function IsSafe($string) {
             return !preg_match('/[^a-zA-Z0-9_]/', $string);
         }
 
@@ -92,7 +133,7 @@
                 $result = $query->execute();
                 if ($result === false) return false;
             } catch (Exception $e) {
-                //print_r($e);
+                $this->error_query = $query;
                 return false;
             }
 
@@ -126,10 +167,6 @@
 
             $tableMap = fn($table) => $table["Tables_in_{$this->db_database}"];
             return array_map($tableMap, $tables);
-        }
-
-        public function GetLastInsertID() {
-            return $this->conn->insert_id;
         }
 
         /**
