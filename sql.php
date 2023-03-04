@@ -18,12 +18,18 @@
         /**
          * DataBase constructor.
          * @param bool $openConnection If the connection should be opened.
+         * @param string|null $settingsPath The path to the config file,
+         *                        if null the default config file will be used.
          * @throws Exception if the config file is not found or failed to read.
          * @throws Exception if the config file is not valid JSON.
          * @throws Exception if the parsing of the config file failed.
          * @throws Exception if the connection failed.
          */
-        public function __construct($openConnection = true, $settingsPath = $this->default_config_filename) {
+        public function __construct($openConnection = true, $settingsPath = null) {
+            if ($settingsPath === null) {
+                $settingsPath = $this->default_config_filename;
+            }
+
             if (!file_exists($settingsPath)) {
                 throw(new Exception("{$this->default_config_filename} not found"));
             }
