@@ -13,27 +13,29 @@
         private $db_username;
         private $db_password;
 
+        private $default_config_filename = __DIR__ . '/config.json';
+
         /**
          * DataBase constructor.
          * @param bool $openConnection If the connection should be opened.
-         * @throws Exception if the settings.json file is not found or failed to read.
-         * @throws Exception if the settings.json file is not valid JSON.
-         * @throws Exception if the parsing of the settings.json file failed.
+         * @throws Exception if the config file is not found or failed to read.
+         * @throws Exception if the config file is not valid JSON.
+         * @throws Exception if the parsing of the config file failed.
          * @throws Exception if the connection failed.
          */
-        public function __construct($openConnection = true, $settingsPath = __DIR__ . '/settings.json') {
+        public function __construct($openConnection = true, $settingsPath = $this->default_config_filename) {
             if (!file_exists($settingsPath)) {
-                throw(new Exception('settings.json not found'));
+                throw(new Exception("{$this->default_config_filename} not found"));
             }
 
             $settingsContent = file_get_contents($settingsPath);
             if ($settingsContent === false) {
-                throw(new Exception('Failed to read settings.json'));
+                throw(new Exception("Failed to read {$this->default_config_filename}"));
             }
 
             $settings = json_decode($settingsContent);
             if ($settings === null) {
-                throw(new Exception('Failed to parse settings.json'));
+                throw(new Exception("Failed to parse {$this->default_config_filename}"));
             }
 
             $this->db_hostname = $settings->hostname;

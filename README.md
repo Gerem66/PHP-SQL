@@ -1,7 +1,7 @@
 # PHP-SQL
 
 ## Setup
-* Create a configuration file named `settings.json` with content:
+* Create a configuration file named `config.json` with content:
 ```json
 {
     "hostname": "localhost",
