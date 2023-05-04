@@ -7,6 +7,7 @@
     "hostname": "localhost",
     "database": "",
     "username": "",
-    "password": ""
+    "password": "",
+    "encrypt-key": ""
 }
 ```

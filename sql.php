@@ -1,9 +1,14 @@
 <?php
 
+    require_once(__DIR__.'/encryption.php');
+
     class DataBase
     {
         /** @var mysqli $conn */
         private $conn = null;
+
+        /** @var Encryption|null */
+        public $encryption = null;
 
         /** @var mysqli_stmt|null $error_query */
         private $error_query = null;
@@ -58,9 +63,13 @@
                 );
                 if ($this->conn->connect_error) {
                     $error = $this->conn->connect_error;
+                    print_r($error);
+                    exit;
                     throw(new Exception('Connection failed: ' . $error));
                 }
             }
+
+            $this->encryption = new Encryption($settings->{'encrypt-key'});
         }
 
         public function __destruct() {
@@ -108,7 +117,7 @@
          * @param string $types The types of the parameters. ('i'(nteger), 'd'(ouble), 's'(tring), 'b'(lob))
          * @param array $variables The variables to bind to the query.
          * @param boolean $execute If the query should be executed or not.
-         * @param mixed $query The query to execute.
+         * @param mysqli_stmt|false $query The query to execute.
          * @return array|int|mysqli_stmt|false Array if query type is select, otherwise the number of affected rows or false if the query failed.
          * @throws Exception if the connection is not open.
          */
