@@ -69,7 +69,7 @@
                 }
             }
 
-            $this->encryption = new Encryption($settings->{'encrypt-key'});
+            $this->encryption = new Encryption($settings->{'encrypt-key'}, $settings->{'encrypt-second-key'});
         }
 
         public function __destruct() {

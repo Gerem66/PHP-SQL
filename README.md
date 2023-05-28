@@ -8,6 +8,7 @@
     "database": "",
     "username": "",
     "password": "",
-    "encrypt-key": ""
+    "encrypt-key": "",
+    "encrypt-second-key": ""
 }
 ```
