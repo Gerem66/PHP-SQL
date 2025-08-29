@@ -53,13 +53,15 @@
             $this->db_database = $settings->database;
             $this->db_username = $settings->username;
             $this->db_password = $settings->password;
+            $this->db_port = $settings->port ?? 3306;
 
             if ($openConnection) {
                 $this->conn = new mysqli(
                     $this->db_hostname,
                     $this->db_username,
                     $this->db_password,
-                    $this->db_database
+                    $this->db_database,
+                    $this->db_port
                 );
                 if ($this->conn->connect_error) {
                     $error = $this->conn->connect_error;
