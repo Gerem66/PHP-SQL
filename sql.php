@@ -56,6 +56,11 @@
             $this->db_port = $settings->port ?? 3306;
 
             if ($openConnection) {
+                // Check and warn to avoid Unix socket issues
+                if ($this->db_hostname === 'localhost') {
+                    throw new Exception("Configuration error: Use '127.0.0.1' instead of 'localhost' in config.json to avoid Unix socket errors with mysqli.");
+                }
+
                 $this->conn = new mysqli(
                     $this->db_hostname,
                     $this->db_username,
