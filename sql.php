@@ -10,7 +10,7 @@
         /** @var Encryption|null */
         public $encryption = null;
 
-        /** @var mysqli_stmt|null $error_query */
+        /** @var Exception|null $error_query */
         private $error_query = null;
 
         private $db_hostname;
@@ -88,7 +88,7 @@
 
         /**
          * Used to get the last error.
-         * @return mysqli_stmt|null The last error or null if there is no error.
+         * @return Exception|null The last error or null if there is no error.
          */
         public function GetError() {
             if ($this->conn === null || $this->error_query === null) {
@@ -157,7 +157,7 @@
                 $result = $query->execute();
                 if ($result === false) return false;
             } catch (Exception $e) {
-                $this->error_query = $query;
+                $this->error_query = $e;
                 return false;
             }
 
