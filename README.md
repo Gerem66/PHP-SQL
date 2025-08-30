@@ -5,7 +5,7 @@ Small library to simplify SQL queries and add encryption features.
 * Create a configuration file named `config.json` with content:
 ```json
 {
-    "hostname": "localhost",
+    "hostname": "127.0.0.1",
     "database": "",
     "username": "",
     "password": "",
